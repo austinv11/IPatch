@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/IPatch.iml" filepath="$PROJECT_DIR$/.idea/modules/IPatch.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/IPatch_main.iml" filepath="$PROJECT_DIR$/.idea/modules/IPatch_main.iml" group="IPatch" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/IPatch_test.iml" filepath="$PROJECT_DIR$/.idea/modules/IPatch_test.iml" group="IPatch" />
+    </modules>
+  </component>
+</project>
