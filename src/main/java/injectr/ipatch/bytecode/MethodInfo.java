@@ -50,27 +50,27 @@ public final class MethodInfo {
         this.attributes = attributes;
     }
 
-    public char[][] getInfo() {
+    public byte[][] getInfo() {
         long len = 8L;
         for (AttributeInfo attr : attributes)
             len += attr.getInfoByteLength() + 6L;
-        char[][] buf = BytesUtil.allocate(len);
-        long offset = BytesUtil.insert(new char[]{(char) (access_flags >> 8),
-                (char) (access_flags & 0xFF),
-                (char) (name_index >> 8),
-                (char) (name_index & 0xFF),
-                (char) (descriptor_index >> 8),
-                (char) (descriptor_index & 0xFF),
-                (char) (attributes_count >> 8),
-                (char) (attributes_count & 0xFF)}, buf, 0);
+        byte[][] buf = BytesUtil.allocate(len);
+        long offset = BytesUtil.insert(new byte[]{(byte) (access_flags >> 8),
+                (byte) (access_flags & 0xFF),
+                (byte) (name_index >> 8),
+                (byte) (name_index & 0xFF),
+                (byte) (descriptor_index >> 8),
+                (byte) (descriptor_index & 0xFF),
+                (byte) (attributes_count >> 8),
+                (byte) (attributes_count & 0xFF)}, buf, 0);
         for (AttributeInfo info : attributes) {
-            offset += BytesUtil.insert(new char[]{(char) (info.getAttributeNameIndex() >> 8),
-                    (char) (info.getAttributeNameIndex() & 0xFF),
-                    (char) (info.getAttributeLength() >> 24),
-                    (char) (info.getAttributeLength() >> 16),
-                    (char) (info.getAttributeLength() >> 8),
-                    (char) (info.getAttributeLength() & 0xFF)}, buf, offset);
-            for (char[] chunk : info.getInfo())
+            offset += BytesUtil.insert(new byte[]{(byte) (info.getAttributeNameIndex() >> 8),
+                    (byte) (info.getAttributeNameIndex() & 0xFF),
+                    (byte) (info.getAttributeLength() >> 24),
+                    (byte) (info.getAttributeLength() >> 16),
+                    (byte) (info.getAttributeLength() >> 8),
+                    (byte) (info.getAttributeLength() & 0xFF)}, buf, offset);
+            for (byte[] chunk : info.getInfo())
                 offset += BytesUtil.insert(chunk, buf, offset);
         }
         return buf;

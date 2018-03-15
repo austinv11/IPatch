@@ -6,27 +6,27 @@ import java.io.UnsupportedEncodingException;
 
 public abstract class ConstantPoolInfo {
     //Constant pool tags: https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.4-150
-    public static final char CONSTANT_class = 7;
-    public static final char CONSTANT_Fieldref = 9;
-    public static final char CONSTANT_Methodref = 10;
-    public static final char CONSTANT_InterfaceMethodref = 11;
-    public static final char CONSTANT_String = 8;
-    public static final char CONSTANT_Integer = 3;
-    public static final char CONSTANT_Float = 4;
-    public static final char CONSTANT_Long = 5;
-    public static final char CONSTANT_Double = 6;
-    public static final char CONSTANT_NameAndType = 12;
-    public static final char CONSTANT_Utf8 = 1;
-    public static final char CONSTANT_MethodHandle = 15;
-    public static final char CONSTANT_MethodType = 16;
-    public static final char CONSTANT_InvokeDynamic = 18;
-    public static final char CONSTANT_Module = 19;
-    public static final char CONSTANT_Package = 20;
+    public static final byte CONSTANT_class = 7;
+    public static final byte CONSTANT_Fieldref = 9;
+    public static final byte CONSTANT_Methodref = 10;
+    public static final byte CONSTANT_InterfaceMethodref = 11;
+    public static final byte CONSTANT_String = 8;
+    public static final byte CONSTANT_Integer = 3;
+    public static final byte CONSTANT_Float = 4;
+    public static final byte CONSTANT_Long = 5;
+    public static final byte CONSTANT_Double = 6;
+    public static final byte CONSTANT_NameAndType = 12;
+    public static final byte CONSTANT_Utf8 = 1;
+    public static final byte CONSTANT_MethodHandle = 15;
+    public static final byte CONSTANT_MethodType = 16;
+    public static final byte CONSTANT_InvokeDynamic = 18;
+    public static final byte CONSTANT_Module = 19;
+    public static final byte CONSTANT_Package = 20;
 
     public static ConstantPoolInfo[] readClassPoolInfo(int constant_pool_count, DataInputStream stream) throws IOException {
         ConstantPoolInfo[] info = new ConstantPoolInfo[constant_pool_count]; //According to the spec you have to do this /shrug
         for (int i = 1; i < constant_pool_count; i++) { //1 indexing for some reason
-            char tag = (char) stream.readByte();
+            byte tag = (byte) stream.readByte();
             switch (tag) {
                 case CONSTANT_class:
                     info[i] = new ClassInfo(tag, stream.readUnsignedShort());
@@ -57,7 +57,7 @@ public abstract class ConstantPoolInfo {
                     info[i] = new Utf8Info(tag, length, data);
                     break;
                 case CONSTANT_MethodHandle:
-                    info[i] = new MethodHandleInfo(tag, (char) stream.readByte(), stream.readUnsignedShort());
+                    info[i] = new MethodHandleInfo(tag, (byte) stream.readByte(), stream.readUnsignedShort());
                     break;
                 case CONSTANT_MethodType:
                     info[i] = new MethodTypeInfo(tag, stream.readUnsignedShort());
@@ -78,20 +78,20 @@ public abstract class ConstantPoolInfo {
         return info;
     }
 
-    private final char tag; //Unsigned byte
+    private final byte tag; //Unsigned byte
 
-    public ConstantPoolInfo(char tag) {
+    public ConstantPoolInfo(byte tag) {
         this.tag = tag;
     }
 
     /**
      * Specifies the constant pool info type.
      */
-    public char getTag() {
+    public byte getTag() {
         return tag;
     }
 
-    public abstract char[] getInfo();
+    public abstract byte[] getInfo();
 
     /**
      * https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.4.1
@@ -100,14 +100,14 @@ public abstract class ConstantPoolInfo {
 
         private final int name_index; //Unsigned short
 
-        public ClassInfo(char tag, int name_index) {
+        public ClassInfo(byte tag, int name_index) {
             super(tag);
             this.name_index = name_index;
         }
 
         @Override
-        public char[] getInfo() {
-            return new char[] {(char) (name_index >> 8) , (char) (name_index & 0xFF)};
+        public byte[] getInfo() {
+            return new byte[] {(byte) (name_index >> 8) , (byte) (name_index & 0xFF)};
         }
 
         public int getNameIndex() {
@@ -123,16 +123,16 @@ public abstract class ConstantPoolInfo {
         private final int class_index; //Unsigned short
         private final int name_and_type_index; //Unsigned short
 
-        public RefInfo(char tag, int class_index, int name_and_type_index) {
+        public RefInfo(byte tag, int class_index, int name_and_type_index) {
             super(tag);
             this.class_index = class_index;
             this.name_and_type_index = name_and_type_index;
         }
 
         @Override
-        public char[] getInfo() {
-            return new char[] {(char) (class_index >> 8) , (char) (class_index & 0xFF),
-                    (char) (name_and_type_index >> 8) , (char) (name_and_type_index & 0xFF)};
+        public byte[] getInfo() {
+            return new byte[] {(byte) (class_index >> 8) , (byte) (class_index & 0xFF),
+                    (byte) (name_and_type_index >> 8) , (byte) (name_and_type_index & 0xFF)};
         }
 
         public int getClassIndex() {
@@ -151,14 +151,14 @@ public abstract class ConstantPoolInfo {
 
         private final int string_index; //Unsigned short
 
-        public StringInfo(char tag, int string_index) {
+        public StringInfo(byte tag, int string_index) {
             super(tag);
             this.string_index = string_index;
         }
 
         @Override
-        public char[] getInfo() {
-            return new char[] {(char) (string_index >> 8) , (char) (string_index & 0xFF)};
+        public byte[] getInfo() {
+            return new byte[] {(byte) (string_index >> 8) , (byte) (string_index & 0xFF)};
         }
 
         public int getStringIndex() {
@@ -178,17 +178,17 @@ public abstract class ConstantPoolInfo {
 
         private final int bytes;
 
-        public IntegerFloatInfo(char tag, int bytes) {
+        public IntegerFloatInfo(byte tag, int bytes) {
             super(tag);
             this.bytes = bytes;
         }
 
         @Override
-        public char[] getInfo() {
-            return new char[] {(char) (bytes >> 24),
-                    (char)((bytes >> 16) & 0xFF),
-                    (char)((bytes >> 8) & 0xFF),
-                    (char) (bytes & 0xFF)};
+        public byte[] getInfo() {
+            return new byte[] {(byte) (bytes >> 24),
+                    (byte)((bytes >> 16) & 0xFF),
+                    (byte)((bytes >> 8) & 0xFF),
+                    (byte) (bytes & 0xFF)};
         }
 
         public int getBytes() {
@@ -212,22 +212,22 @@ public abstract class ConstantPoolInfo {
         private final int high_bytes;
         private final int low_bytes;
 
-        public LongDoubleInfo(char tag, int high_bytes, int low_bytes) {
+        public LongDoubleInfo(byte tag, int high_bytes, int low_bytes) {
             super(tag);
             this.high_bytes = high_bytes;
             this.low_bytes = low_bytes;
         }
 
         @Override
-        public char[] getInfo() {
-            return new char[] {(char) (high_bytes >> 24),
-                    (char)((high_bytes >> 16) & 0xFF),
-                    (char)((high_bytes >> 8) & 0xFF),
-                    (char) (high_bytes & 0xFF),
-                    (char) (low_bytes >> 24),
-                    (char)((low_bytes >> 16) & 0xFF),
-                    (char)((low_bytes >> 8) & 0xFF),
-                    (char) (low_bytes & 0xFF)};
+        public byte[] getInfo() {
+            return new byte[] {(byte) (high_bytes >> 24),
+                    (byte)((high_bytes >> 16) & 0xFF),
+                    (byte)((high_bytes >> 8) & 0xFF),
+                    (byte) (high_bytes & 0xFF),
+                    (byte) (low_bytes >> 24),
+                    (byte)((low_bytes >> 16) & 0xFF),
+                    (byte)((low_bytes >> 8) & 0xFF),
+                    (byte) (low_bytes & 0xFF)};
         }
 
         public int getHighBytes() {
@@ -259,22 +259,22 @@ public abstract class ConstantPoolInfo {
         private final int name_index; //Unsigned short
         private final int descriptor_index; //Unsigned short
 
-        public NameAndTypeInfo(char tag, int name_index, int descriptor_index) {
+        public NameAndTypeInfo(byte tag, int name_index, int descriptor_index) {
             super(tag);
             this.name_index = name_index;
             this.descriptor_index = descriptor_index;
         }
 
         @Override
-        public char[] getInfo() {
-            return new char[] {(char) (name_index >> 24),
-                    (char)((name_index >> 16) & 0xFF),
-                    (char)((name_index >> 8) & 0xFF),
-                    (char) (name_index & 0xFF),
-                    (char) (descriptor_index >> 24),
-                    (char)((descriptor_index >> 16) & 0xFF),
-                    (char)((descriptor_index >> 8) & 0xFF),
-                    (char) (descriptor_index & 0xFF)};
+        public byte[] getInfo() {
+            return new byte[] {(byte) (name_index >> 24),
+                    (byte)((name_index >> 16) & 0xFF),
+                    (byte)((name_index >> 8) & 0xFF),
+                    (byte) (name_index & 0xFF),
+                    (byte) (descriptor_index >> 24),
+                    (byte)((descriptor_index >> 16) & 0xFF),
+                    (byte)((descriptor_index >> 8) & 0xFF),
+                    (byte) (descriptor_index & 0xFF)};
         }
 
         public int getNameIndex() {
@@ -294,17 +294,17 @@ public abstract class ConstantPoolInfo {
         private final int length; //Unsigned short
         private final byte[] bytes;
 
-        public Utf8Info(char tag, int length, byte[] bytes) {
+        public Utf8Info(byte tag, int length, byte[] bytes) {
             super(tag);
             this.length = length;
             this.bytes = bytes;
         }
 
         @Override
-        public char[] getInfo() {
-            char[] info = new char[2 + length];
-            info[0] = (char) (length >> 8);
-            info[1] = (char) (length & 0xFF);
+        public byte[] getInfo() {
+            byte[] info = new byte[2 + length];
+            info[0] = (byte) (length >> 8);
+            info[1] = (byte) (length & 0xFF);
             System.arraycopy(bytes, 0, info, 2, length);
             return info;
         }
@@ -331,23 +331,23 @@ public abstract class ConstantPoolInfo {
      */
     public static final class MethodHandleInfo extends ConstantPoolInfo {
 
-        private final char reference_kind;
+        private final byte reference_kind;
         private final int reference_index; //Unsigned short
 
-        public MethodHandleInfo(char tag, char reference_kind, int reference_index) {
+        public MethodHandleInfo(byte tag, byte reference_kind, int reference_index) {
             super(tag);
             this.reference_kind = reference_kind;
             this.reference_index = reference_index;
         }
 
         @Override
-        public char[] getInfo() {
-            return new char[] {reference_kind,
-                    (char) (reference_index >> 8),
-                    (char) (reference_index & 0xFF)};
+        public byte[] getInfo() {
+            return new byte[] {reference_kind,
+                    (byte) (reference_index >> 8),
+                    (byte) (reference_index & 0xFF)};
         }
 
-        public char getReferenceKind() {
+        public byte getReferenceKind() {
             return reference_kind;
         }
 
@@ -363,14 +363,14 @@ public abstract class ConstantPoolInfo {
 
         private final int descriptor_index; //Unsigned short
 
-        public MethodTypeInfo(char tag, int descriptor_index) {
+        public MethodTypeInfo(byte tag, int descriptor_index) {
             super(tag);
             this.descriptor_index = descriptor_index;
         }
 
         @Override
-        public char[] getInfo() {
-            return new char[]{(char) (descriptor_index >> 8), (char) (descriptor_index & 0xFF)};
+        public byte[] getInfo() {
+            return new byte[]{(byte) (descriptor_index >> 8), (byte) (descriptor_index & 0xFF)};
         }
 
         public int getDescriptorIndex() {
@@ -386,16 +386,16 @@ public abstract class ConstantPoolInfo {
         private final int bootstrap_method_attr_index; //Unsigned short
         private final int name_and_type_index; //Unsigned short
 
-        public InvokeDynamicInfo(char tag, int bootstrap_method_attr_index, int name_and_type_index) {
+        public InvokeDynamicInfo(byte tag, int bootstrap_method_attr_index, int name_and_type_index) {
             super(tag);
             this.bootstrap_method_attr_index = bootstrap_method_attr_index;
             this.name_and_type_index = name_and_type_index;
         }
 
         @Override
-        public char[] getInfo() {
-            return new char[] {(char) (bootstrap_method_attr_index >> 8) , (char) (bootstrap_method_attr_index & 0xFF),
-                    (char) (name_and_type_index >> 8) , (char) (name_and_type_index & 0xFF)};
+        public byte[] getInfo() {
+            return new byte[] {(byte) (bootstrap_method_attr_index >> 8) , (byte) (bootstrap_method_attr_index & 0xFF),
+                    (byte) (name_and_type_index >> 8) , (byte) (name_and_type_index & 0xFF)};
         }
 
         public int getBootstrapMethodAttrIndex() {
@@ -414,14 +414,14 @@ public abstract class ConstantPoolInfo {
 
         private final int name_index; //Unsigned short
 
-        public ModuleInfo(char tag, int name_index) {
+        public ModuleInfo(byte tag, int name_index) {
             super(tag);
             this.name_index = name_index;
         }
 
         @Override
-        public char[] getInfo() {
-            return new char[]{(char) (name_index >> 8), (char) (name_index & 0xFF)};
+        public byte[] getInfo() {
+            return new byte[]{(byte) (name_index >> 8), (byte) (name_index & 0xFF)};
         }
 
         public int getNameIndex() {
@@ -436,14 +436,14 @@ public abstract class ConstantPoolInfo {
 
         private final int name_index; //Unsigned short
 
-        public PackageInfo(char tag, int name_index) {
+        public PackageInfo(byte tag, int name_index) {
             super(tag);
             this.name_index = name_index;
         }
 
         @Override
-        public char[] getInfo() {
-            return new char[]{(char) (name_index >> 8), (char) (name_index & 0xFF)};
+        public byte[] getInfo() {
+            return new byte[]{(byte) (name_index >> 8), (byte) (name_index & 0xFF)};
         }
 
         public int getNameIndex() {

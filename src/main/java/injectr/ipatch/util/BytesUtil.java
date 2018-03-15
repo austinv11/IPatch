@@ -2,15 +2,17 @@ package injectr.ipatch.util;
 
 public class BytesUtil {
 
+    public static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 5; //Based on Hotspot VM, Source: https://stackoverflow.com/a/3039805
+
     /**
-     * Generates an empty buffer using a 2d char array data structure which has the specified total capacity.
+     * Generates an empty buffer using a 2d byte array data structure which has the specified total capacity.
      */
-    public static char[][] allocate(long n) {
-        int requiredArrays = (int) ((n / ((long) Integer.MAX_VALUE)) + 1);
-        char[][] arrays = new char[requiredArrays][];
+    public static byte[][] allocate(long n) {
+        int requiredArrays = (int) ((n / ((long) MAX_ARRAY_SIZE)) + 1);
+        byte[][] arrays = new byte[requiredArrays][];
         for (int i = 0; i < requiredArrays; i++) {
-            char[] currArray = n == requiredArrays - 1 ? new char[(int) n] : new char[Integer.MAX_VALUE];
-            n -= Integer.MAX_VALUE;
+            byte[] currArray = i == requiredArrays - 1 ? new byte[(int) n] : new byte[MAX_ARRAY_SIZE];
+            n -= MAX_ARRAY_SIZE;
             arrays[i] = currArray;
         }
         return arrays;
@@ -20,7 +22,7 @@ public class BytesUtil {
      * Inserts the specified data into the specified buffer with the given offset and returns the amount of data inserted..
      * Note: Expects a buffer in the form returned from {@link #allocate(long)}.
      */
-    public static int insert(char[] data, char[][] buf, long offset) {
+    public static int insert(byte[] data, byte[][] buf, long offset) {
         if (buf.length == 0)
             throw new RuntimeException("Buffer too small!");
 
@@ -40,7 +42,7 @@ public class BytesUtil {
             offset -= ((long) arraysToSkip) * ((long) normalArrayLen);
             int dataPointer = 0;
             for (int i = arraysToSkip; dataPointer < data.length; i++) {
-                char[] currArray = buf[i];
+                byte[] currArray = buf[i];
                 int startIndex = (int) offset;
                 int len = Math.min(currArray.length - startIndex, data.length);
                 System.arraycopy(data, dataPointer, currArray, startIndex, len);
