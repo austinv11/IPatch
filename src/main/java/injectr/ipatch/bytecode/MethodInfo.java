@@ -6,32 +6,34 @@ import java.io.DataInputStream;
 import java.io.IOException;
 
 /**
- * https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.5
+ * https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.6
  */
-public final class FieldInfo {
+public final class MethodInfo {
 
-    //Access flags: https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.5-200-A.1
+    //Access flags https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.6-200-A.1
     public static final int ACC_PUBLIC = 0x0001;
     public static final int ACC_PRIVATE = 0x0002;
     public static final int ACC_PROTECTED = 0x0004;
     public static final int ACC_STATIC = 0x0008;
     public static final int ACC_FINAL = 0x0010;
-    public static final int ACC_VOLATILE = 0x0040;
-    public static final int ACC_TRANSIENT = 0x0080;
+    public static final int ACC_SYNCHRONIZED = 0x0020;
+    public static final int ACC_BRIDGE = 0x0040;
+    public static final int ACC_VARARGS = 0x0080;
+    public static final int ACC_NATIVE = 0x0100;
+    public static final int ACC_STRICT = 0x0800;
     public static final int ACC_SYNTHETIC = 0x1000;
-    public static final int ACC_ENUM = 0x4000;
 
-    public static FieldInfo[] readFieldInfo(int field_info_count, ConstantPoolInfo[] constant_pool, DataInputStream stream) throws IOException {
-        FieldInfo[] fields = new FieldInfo[field_info_count];
-        for (int i = 0; i < field_info_count; i++) {
+    public static MethodInfo[] readMethodInfo(int method_count, ConstantPoolInfo[] constant_pool, DataInputStream stream) throws IOException {
+        MethodInfo[] methods = new MethodInfo[method_count];
+        for (int i = 0; i < method_count; i++) {
             int flags = stream.readUnsignedShort();
             int name = stream.readUnsignedShort();
             int descriptor = stream.readUnsignedShort();
             int attr_count = stream.readUnsignedShort();
             AttributeInfo[] attr = AttributeInfo.readAttributeInfo(attr_count, constant_pool, stream);
-            fields[i] = new FieldInfo(flags, name, descriptor, attr_count, attr);
+            methods[i] = new MethodInfo(flags, name, descriptor, attr_count, attr);
         }
-        return fields;
+        return methods;
     }
 
     private final int access_flags; //Unsigned short
@@ -40,7 +42,7 @@ public final class FieldInfo {
     private final int attributes_count; //Unsigned short
     private final AttributeInfo[] attributes;
 
-    public FieldInfo(int access_flags, int name_index, int descriptor_index, int attributes_count, AttributeInfo[] attributes) {
+    public MethodInfo(int access_flags, int name_index, int descriptor_index, int attributes_count, AttributeInfo[] attributes) {
         this.access_flags = access_flags;
         this.name_index = name_index;
         this.descriptor_index = descriptor_index;

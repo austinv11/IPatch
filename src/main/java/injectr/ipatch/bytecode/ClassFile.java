@@ -53,9 +53,16 @@ public final class ClassFile {
         int fields_count = data.readUnsignedShort();
         FieldInfo[] fields = FieldInfo.readFieldInfo(fields_count, constant_pool, data);
 
+        int methods_count = data.readUnsignedShort();
+        MethodInfo[] methods = MethodInfo.readMethodInfo(methods_count, constant_pool, data);
+
+        int attributes_count = data.readUnsignedShort();
+        AttributeInfo[] attributes = AttributeInfo.readAttributeInfo(attributes_count, constant_pool, data);
+
         data.close();
         return new ClassFile(minor_version, major_version, constant_pool_count, constant_pool,
-                access_flags, this_class, super_class, interfaces_count, interfaces, fields_count, fields);
+                access_flags, this_class, super_class, interfaces_count, interfaces, fields_count, fields,
+                methods_count, methods, attributes_count, attributes);
     }
 
     public static ClassFile readFrom(byte[] bytes) throws IOException {
@@ -72,8 +79,12 @@ public final class ClassFile {
     private final int[] interfaces; //Unsigned shorts!
     private final int fields_count; //Unsigned short!
     private final FieldInfo[] fields;
+    private final int methods_count; //Unsigned short!
+    private final MethodInfo[] methods;
+    private final int attributes_count; //Unsigned short!
+    private final AttributeInfo[] attributes;
 
-    public ClassFile(int minor_version, int major_version, int constant_pool_count, ConstantPoolInfo[] constant_pool, int access_flags, int this_class, int super_class, int interfaces_count, int[] interfaces, int fields_count, FieldInfo[] fields) {
+    public ClassFile(int minor_version, int major_version, int constant_pool_count, ConstantPoolInfo[] constant_pool, int access_flags, int this_class, int super_class, int interfaces_count, int[] interfaces, int fields_count, FieldInfo[] fields, int methods_count, MethodInfo[] methods, int attributes_count, AttributeInfo[] attributes) {
         this.minor_version = minor_version;
         this.major_version = major_version;
         this.constant_pool_count = constant_pool_count;
@@ -85,6 +96,69 @@ public final class ClassFile {
         this.interfaces = interfaces;
         this.fields_count = fields_count;
         this.fields = fields;
+        this.methods_count = methods_count;
+        this.methods = methods;
+        this.attributes_count = attributes_count;
+        this.attributes = attributes;
     }
 
+    public int getMinorVersion() {
+        return minor_version;
+    }
+
+    public int getMajorVersion() {
+        return major_version;
+    }
+
+    public int getConstantPoolCount() {
+        return constant_pool_count;
+    }
+
+    public ConstantPoolInfo[] getConstantPool() {
+        return constant_pool;
+    }
+
+    public int getAccessFlags() {
+        return access_flags;
+    }
+
+    public int getThisClass() {
+        return this_class;
+    }
+
+    public int getSuperClass() {
+        return super_class;
+    }
+
+    public int getInterfacesCount() {
+        return interfaces_count;
+    }
+
+    public int[] getInterfaces() {
+        return interfaces;
+    }
+
+    public int getFieldsCount() {
+        return fields_count;
+    }
+
+    public FieldInfo[] getFields() {
+        return fields;
+    }
+
+    public int getMethodsCount() {
+        return methods_count;
+    }
+
+    public MethodInfo[] getMethods() {
+        return methods;
+    }
+
+    public int getAttributesCount() {
+        return attributes_count;
+    }
+
+    public AttributeInfo[] getAttributes() {
+        return attributes;
+    }
 }
