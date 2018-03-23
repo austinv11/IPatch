@@ -479,8 +479,7 @@ public abstract class AttributeInfo {
             long nestedAttributesLength = 0L;
             for (AttributeInfo info : attributes)
                 nestedAttributesLength += info.getInfoByteLength();
-            return (2L * 4L) //Unsigned shorts
-                    + (4L) //Unsigned int
+            return 12L
                     + code_length
                     + (((long) exception_table_length) * 8L) //4 unsigned shorts per table
                     + nestedAttributesLength;

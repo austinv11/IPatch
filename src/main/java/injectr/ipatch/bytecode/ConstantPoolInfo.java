@@ -26,7 +26,7 @@ public abstract class ConstantPoolInfo {
     public static ConstantPoolInfo[] readClassPoolInfo(int constant_pool_count, DataInputStream stream) throws IOException {
         ConstantPoolInfo[] info = new ConstantPoolInfo[constant_pool_count]; //According to the spec you have to do this /shrug
         for (int i = 1; i < constant_pool_count; i++) { //1 indexing for some reason
-            byte tag = (byte) stream.readByte();
+            byte tag = stream.readByte();
             switch (tag) {
                 case CONSTANT_class:
                     info[i] = new ClassInfo(tag, stream.readUnsignedShort());
@@ -93,6 +93,14 @@ public abstract class ConstantPoolInfo {
 
     public abstract byte[] getInfo();
 
+    public byte[] toBytes() {
+        byte[] info = getInfo();
+        byte[] dat = new byte[info.length + 1];
+        dat[0] = tag;
+        System.arraycopy(info, 0, dat, 1, info.length);
+        return dat;
+    }
+
     /**
      * https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.4.1
      */
@@ -131,8 +139,8 @@ public abstract class ConstantPoolInfo {
 
         @Override
         public byte[] getInfo() {
-            return new byte[] {(byte) (class_index >> 8) , (byte) (class_index & 0xFF),
-                    (byte) (name_and_type_index >> 8) , (byte) (name_and_type_index & 0xFF)};
+            return new byte[] {(byte) (class_index >> 8), (byte) (class_index & 0xFF),
+                    (byte) (name_and_type_index >> 8), (byte) (name_and_type_index & 0xFF)};
         }
 
         public int getClassIndex() {
@@ -267,13 +275,9 @@ public abstract class ConstantPoolInfo {
 
         @Override
         public byte[] getInfo() {
-            return new byte[] {(byte) (name_index >> 24),
-                    (byte)((name_index >> 16) & 0xFF),
-                    (byte)((name_index >> 8) & 0xFF),
+            return new byte[] {(byte)(name_index >> 8),
                     (byte) (name_index & 0xFF),
-                    (byte) (descriptor_index >> 24),
-                    (byte)((descriptor_index >> 16) & 0xFF),
-                    (byte)((descriptor_index >> 8) & 0xFF),
+                    (byte) (descriptor_index >> 8),
                     (byte) (descriptor_index & 0xFF)};
         }
 

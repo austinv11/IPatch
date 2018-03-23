@@ -1,5 +1,15 @@
 package injectr.ipatch.util;
 
+import injectr.ipatch.bytecode.ClassFile;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.compress.utils.ChecksumCalculatingInputStream;
+
+import java.io.DataInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Arrays;
+
 public class BytesUtil {
 
     public static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 5; //Based on Hotspot VM, Source: https://stackoverflow.com/a/3039805
@@ -53,5 +63,27 @@ public class BytesUtil {
         }
 
         return data.length;
+    }
+
+    public static byte[] shortToBytes(int i) {
+        return new byte[] {(byte) (i >> 8), (byte) (i & 0xFF)};
+    }
+
+    public static byte[] intToBytes(int i) {
+        return new byte[] {(byte) (i >> 24), (byte) ((i >> 16) & 0xFF), (byte) ((i >> 8) & 0xFF), (byte) (i & 0xFF)};
+    }
+
+    public static ClassFile readAndVerify(InputStream stream) throws IOException {
+        MD5Checksum checksum = new MD5Checksum();
+        try (ChecksumCalculatingInputStream checksumStream = new ChecksumCalculatingInputStream(checksum, stream)) {
+            ClassFile clazz = ClassFile.readFrom(checksumStream);
+            clazz.writeTo(new FileOutputStream("./test2.class"));
+            byte[] originalChecksum = checksum.getBytesValue();
+            byte[] newChecksum = clazz.checksum();
+            if (!Arrays.equals(originalChecksum, newChecksum)) {
+                throw new IOException("Invalid checkums!");
+            }
+            return clazz;
+        }
     }
 }

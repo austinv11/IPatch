@@ -1,6 +1,11 @@
 package injectr.ipatch.bytecode;
 
+import injectr.ipatch.util.MD5Checksum;
+
 import java.io.*;
+
+import static injectr.ipatch.util.BytesUtil.shortToBytes;
+import static injectr.ipatch.util.BytesUtil.intToBytes;
 
 /**
  * Object representation of a compiled classfile
@@ -100,6 +105,75 @@ public final class ClassFile {
         this.methods = methods;
         this.attributes_count = attributes_count;
         this.attributes = attributes;
+    }
+
+    public void writeTo(OutputStream stream) throws IOException {
+        stream.write(intToBytes(MAGIC));
+        stream.write(shortToBytes(minor_version));
+        stream.write(shortToBytes(major_version));
+        stream.write(shortToBytes(constant_pool_count));
+        for (int i = 1; i < constant_pool.length; i++) //Ignore first because constant_pool is 1-indexed!
+            stream.write(constant_pool[i].toBytes());
+        stream.write(shortToBytes(access_flags));
+        stream.write(shortToBytes(this_class));
+        stream.write(shortToBytes(super_class));
+        stream.write(shortToBytes(interfaces_count));
+        for (int i : interfaces)
+            stream.write(shortToBytes(i));
+        stream.write(shortToBytes(fields_count));
+        for (FieldInfo i : fields) {
+            byte[][] info = i.getInfo();
+            for (byte[] b : info)
+                stream.write(b);
+        }
+        stream.write(shortToBytes(methods_count));
+        for (MethodInfo i : methods) {
+            byte[][] info = i.getInfo();
+            for (byte[] b : info)
+                stream.write(b);
+        }
+        stream.write(shortToBytes(attributes_count));
+        for (AttributeInfo i : attributes) {
+            byte[][] info = i.getInfo();
+            for (byte[] b : info)
+                stream.write(b);
+        }
+    }
+    
+    public byte[] checksum() {
+        MD5Checksum checksum = new MD5Checksum();
+        checksum.update(intToBytes(MAGIC));
+        checksum.update(shortToBytes(minor_version));
+        checksum.update(shortToBytes(major_version));
+        checksum.update(shortToBytes(constant_pool_count));
+        for (ConstantPoolInfo i : constant_pool)
+            if (i != null) //Ignore first because constant_pool is 1-indexed!
+                checksum.update(i.toBytes());
+        checksum.update(shortToBytes(access_flags));
+        checksum.update(shortToBytes(this_class));
+        checksum.update(shortToBytes(super_class));
+        checksum.update(shortToBytes(interfaces_count));
+        for (int i : interfaces)
+            checksum.update(shortToBytes(i));
+        checksum.update(shortToBytes(fields_count));
+        for (FieldInfo i : fields) {
+            byte[][] info = i.getInfo();
+            for (byte[] b : info)
+                checksum.update(b);
+        }
+        checksum.update(shortToBytes(methods_count));
+        for (MethodInfo i : methods) {
+            byte[][] info = i.getInfo();
+            for (byte[] b : info)
+                checksum.update(b);
+        }
+        checksum.update(shortToBytes(attributes_count));
+        for (AttributeInfo i : attributes) {
+            byte[][] info = i.getInfo();
+            for (byte[] b : info)
+                checksum.update(b);
+        }
+        return checksum.getBytesValue();
     }
 
     public int getMinorVersion() {

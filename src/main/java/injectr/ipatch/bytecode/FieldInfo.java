@@ -65,8 +65,8 @@ public final class FieldInfo {
             offset += BytesUtil.insert(new byte[]{(byte) (info.getAttributeNameIndex() >> 8),
                     (byte) (info.getAttributeNameIndex() & 0xFF),
                     (byte) (info.getAttributeLength() >> 24),
-                    (byte) (info.getAttributeLength() >> 16),
-                    (byte) (info.getAttributeLength() >> 8),
+                    (byte) ((info.getAttributeLength() >> 16) & 0xFF),
+                    (byte) ((info.getAttributeLength() >> 8) & 0xFF),
                     (byte) (info.getAttributeLength() & 0xFF)}, buf, offset);
             for (byte[] chunk : info.getInfo())
                 offset += BytesUtil.insert(chunk, buf, offset);

@@ -6,6 +6,7 @@ import injectr.ipatch.bytecode.ClassFile;
 import injectr.ipatch.cli.Args;
 import injectr.ipatch.compress.CompressType;
 import injectr.ipatch.diff.DiffAlgorithm;
+import injectr.ipatch.util.BytesUtil;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -49,7 +50,7 @@ public class IPatch {
         LOGGER.debug("Diff Algorithm: %s", diffAlgorithm);
 
         try {
-            ClassFile file = ClassFile.readFrom(new FileInputStream("E:\\austi\\Development\\IntelliJ\\IPatch\\out\\production\\classes\\injectr\\ipatch\\Logger.class"));
+            ClassFile file = BytesUtil.readAndVerify(new FileInputStream("/Users/austin_varela/Desktop/Code_Stuffs/IPatch/out/production/classes/injectr/ipatch/bytecode/AttributeInfo.class"));
         } catch (IOException e) {
             e.printStackTrace();
         }
