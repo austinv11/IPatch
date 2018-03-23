@@ -51,7 +51,7 @@ public final class FieldInfo {
     public byte[][] getInfo() {
         long len = 8L;
         for (AttributeInfo attr : attributes)
-            len += attr.getInfoByteLength() + 6L;
+            len += attr.getByteLength();
         byte[][] buf = BytesUtil.allocate(len);
         long offset = BytesUtil.insert(new byte[]{(byte) (access_flags >> 8),
                 (byte) (access_flags & 0xFF),
@@ -62,13 +62,7 @@ public final class FieldInfo {
                 (byte) (attributes_count >> 8),
                 (byte) (attributes_count & 0xFF)}, buf, 0);
         for (AttributeInfo info : attributes) {
-            offset += BytesUtil.insert(new byte[]{(byte) (info.getAttributeNameIndex() >> 8),
-                    (byte) (info.getAttributeNameIndex() & 0xFF),
-                    (byte) (info.getAttributeLength() >> 24),
-                    (byte) ((info.getAttributeLength() >> 16) & 0xFF),
-                    (byte) ((info.getAttributeLength() >> 8) & 0xFF),
-                    (byte) (info.getAttributeLength() & 0xFF)}, buf, offset);
-            for (byte[] chunk : info.getInfo())
+            for (byte[] chunk : info.getBytes())
                 offset += BytesUtil.insert(chunk, buf, offset);
         }
         return buf;

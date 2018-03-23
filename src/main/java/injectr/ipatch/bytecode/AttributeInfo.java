@@ -355,6 +355,23 @@ public abstract class AttributeInfo {
      */
     public abstract long getInfoByteLength();
 
+    public long getByteLength() {
+        return getInfoByteLength() + 6L;
+    }
+
+    public byte[][] getBytes() {
+        byte[][] buf = BytesUtil.allocate(getByteLength());
+        int offset = BytesUtil.insert(new byte[]{(byte) (attribute_name_index >> 8),
+                (byte) (attribute_name_index & 0xFF),
+                (byte) (attribute_length >> 24),
+                (byte) ((attribute_length >> 16) & 0xFF),
+                (byte) ((attribute_length >> 8) & 0xFF),
+                (byte) (attribute_length & 0xFF)}, buf, 0);
+        for (byte[] chunk : getInfo())
+            offset += BytesUtil.insert(chunk, buf, offset);
+        return buf;
+    }
+
     /**
      * Placeholder for unknown attributes as non standard jvm impls may use them
      */
